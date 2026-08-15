@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aa_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aa_service
+      POSTGRES_USER: aa_user
+      POSTGRES_PASSWORD: change_me
+    ports:
+      - "5432:5432"
+    volumes:
+      - aa_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aa_user -d aa_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: aa_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/aa_service
+      DB_USERNAME: aa_user
+      DB_PASSWORD: change_me
+      DIGIO_BASE_URL: ${DIGIO_BASE_URL:-https://ext.digio.in:444}
+      DIGIO_USERNAME: ${DIGIO_USERNAME:?set DIGIO_USERNAME in your .env}
+      DIGIO_PASSWORD: ${DIGIO_PASSWORD:?set DIGIO_PASSWORD in your .env}
+      DIGIO_TEMPLATE_ID: ${DIGIO_TEMPLATE_ID:?set DIGIO_TEMPLATE_ID in your .env}
+      DIGIO_WEBHOOK_SECRET: ${DIGIO_WEBHOOK_SECRET:-}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in your .env}
+    ports:
+      - "8080:8080"
+
+volumes:
+  aa_postgres_data:
