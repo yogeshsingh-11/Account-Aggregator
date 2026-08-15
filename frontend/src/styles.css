@@ -1,0 +1,49 @@
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  background: #f4f6f8;
+  color: #1a1a1a;
+}
+.container {
+  max-width: 640px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+h1 { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { color: #666; margin-bottom: 24px; font-size: 0.9rem; }
+label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 0.85rem; }
+input, select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+button {
+  margin-top: 20px;
+  padding: 10px 18px;
+  background: #2b59ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+button:disabled { background: #a9b6e6; cursor: not-allowed; }
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.status-PENDING { background: #fff4ce; color: #8a6d00; }
+.status-ACTIVE { background: #d3f5df; color: #0a7a34; }
+.status-REJECTED, .status-FAILED { background: #fde2e1; color: #b3261e; }
+.status-EXPIRED, .status-REVOKED { background: #eee; color: #555; }
+.error-text { color: #b3261e; font-size: 0.85rem; margin-top: 8px; }
+.hint { color: #888; font-size: 0.8rem; margin-top: 4px; }

@@ -1,0 +1,39 @@
+<div class="container">
+  <h1>Link your financial accounts</h1>
+  <p class="subtitle">
+    Securely share your account information via the Account Aggregator framework.
+    You control what is shared and for how long.
+  </p>
+
+  <label for="customerRef">Customer reference</label>
+  <input id="customerRef" type="text" [(ngModel)]="customerRef" placeholder="e.g. internal customer / application ID" />
+  <p class="hint">Use your internal customer or application identifier — not a raw mobile number or ID.</p>
+
+  <label for="purposeCode">Purpose</label>
+  <select id="purposeCode" [(ngModel)]="purposeCode">
+    <option value="CREDIT_UNDERWRITING">Credit underwriting</option>
+    <option value="RISK_ANALYTICS">Risk analytics</option>
+    <option value="ACCOUNT_RECONCILIATION">Account reconciliation</option>
+  </select>
+
+  <label>Account types to fetch</label>
+  <div *ngFor="let type of fiTypeOptions">
+    <label style="font-weight: normal; display: inline-flex; align-items: center; gap: 6px;">
+      <input
+        type="checkbox"
+        [checked]="selectedFiTypes.includes(type)"
+        (change)="toggleFiType(type, $any($event.target).checked)"
+      />
+      {{ type }}
+    </label>
+  </div>
+
+  <label for="dataRangeFromDays">Fetch data from the last (days)</label>
+  <input id="dataRangeFromDays" type="number" min="1" max="365" [(ngModel)]="dataRangeFromDays" />
+
+  <div class="error-text" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <button (click)="submit()" [disabled]="submitting">
+    {{ submitting ? 'Starting consent…' : 'Continue' }}
+  </button>
+</div>

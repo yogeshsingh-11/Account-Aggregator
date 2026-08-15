@@ -1,0 +1,33 @@
+<div class="container">
+  <h1>Consent status</h1>
+  <p class="subtitle">We'll update this automatically once you've approved the request.</p>
+
+  <div *ngIf="errorMessage" class="error-text">{{ errorMessage }}</div>
+
+  <ng-container *ngIf="status as s">
+    <p>
+      Status:
+      <span class="status-badge" [ngClass]="'status-' + s.status">{{ s.status }}</span>
+    </p>
+
+    <p *ngIf="s.status === 'PENDING'" class="hint">
+      Waiting for you to approve the request in the consent screen. This page refreshes automatically.
+    </p>
+    <p *ngIf="s.status === 'ACTIVE'" class="hint">
+      Consent approved. Your account data can now be retrieved.
+    </p>
+    <p *ngIf="s.status === 'REJECTED'" class="hint">
+      The request was declined. You can start a new request if you'd like to try again.
+    </p>
+    <p *ngIf="s.status === 'EXPIRED' || s.status === 'REVOKED'" class="hint">
+      This consent is no longer valid. Please start a new request.
+    </p>
+    <p *ngIf="s.status === 'FAILED'" class="hint">
+      Something went wrong processing this request. Please try again or contact support.
+    </p>
+
+    <p class="hint">Consent reference: {{ s.consentHandle }}</p>
+  </ng-container>
+
+  <p *ngIf="!status && !errorMessage" class="hint">Loading…</p>
+</div>

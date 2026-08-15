@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:aa_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+digio:
+  base-url: http://localhost:9999
+  username: test
+  password: test
+  template-id: test-template
+security:
+  internal-api-key: test-key

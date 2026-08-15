@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: account-aggregator-service
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aa_service}
+    username: ${DB_USERNAME:aa_user}
+    password: ${DB_PASSWORD:changeme}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema is owned by Flyway, not Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: never
+    include-stacktrace: never
+
+# --- Digio Account Aggregator sandbox/production config ---
+# NEVER hardcode credentials here. Populate DIGIO_* via environment variables,
+# a local .env (see .env.example), a secrets manager, or your CI/CD secret store.
+digio:
+  base-url: ${DIGIO_BASE_URL:https://ext.digio.in:444}     # sandbox base URL — confirm exact host from Digio docs/onboarding email
+  username: ${DIGIO_USERNAME:}
+  password: ${DIGIO_PASSWORD:}
+  template-id: ${DIGIO_TEMPLATE_ID:}
+  webhook-secret: ${DIGIO_WEBHOOK_SECRET:}                 # used to verify inbound webhook signatures, if provided by Digio
+  connect-timeout-ms: 5000
+  read-timeout-ms: 15000
+
+# Internal API auth for FIU-facing/business endpoints (simple API key scheme; swap for OAuth2/mTLS in production)
+security:
+  internal-api-key: ${INTERNAL_API_KEY:}
+
+# Resilience4j: retry + circuit breaker for all outbound Digio calls
+resilience4j:
+  retry:
+    instances:
+      digioClient:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+        ignore-exceptions:
+          - com.company.aa.exception.DigioClientException
+  circuitbreaker:
+    instances:
+      digioClient:
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId}] %logger{36} - %msg%n"
+  level:
+    com.company.aa: INFO
+    org.springframework.web: INFO
